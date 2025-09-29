@@ -14,15 +14,23 @@ struct MovieList: View {
     @Environment(\.modelContext) private var context
     @State private var newMovie: Movie?
     
-    init(titleFilter: String = "") {
-        let predicate = #Predicate<Movie> { movie in
-            titleFilter.isEmpty || movie.title.localizedStandardContains(titleFilter)
+    init(titleFilter: String = "", isFileredByTitle: Bool) {
+        if isFileredByTitle {
+            let predicate = #Predicate<Movie> { movie in
+                titleFilter.isEmpty || movie.title.localizedStandardContains(titleFilter)
+            }
+            _movies = Query(filter: predicate, sort: \Movie.title)
+        } else {
+            print("Inside else")
+            let predicate = #Predicate<Movie> { movie in
+                titleFilter.isEmpty || movie.releaseDateDescription.localizedStandardContains(titleFilter)
+            }
+            _movies = Query(filter: predicate, sort: \Movie.releaseDateDescription)
         }
-        _movies = Query(filter: predicate, sort: \Movie.title)
     }
     
     var body: some View {
-        Group{
+        Group {
             if !movies.isEmpty {
                 List {
                     ForEach(movies) { movie in
@@ -31,8 +39,12 @@ struct MovieList: View {
                         }
                     }
                     .onDelete(perform: deleteMovies(indexes:))
+                    .onAppear(perform: {
+                        printMovies(indexes: true)
+                    })
+                    
                 }
-            }else {
+            } else {
                 ContentUnavailableView("Add Movies", systemImage: "film.stack")
             }
         }
@@ -44,6 +56,7 @@ struct MovieList: View {
             ToolbarItem(placement: .topBarTrailing) {
                 EditButton()
             }
+            
         }
         .sheet(item: $newMovie) { movie in
             NavigationStack {
@@ -62,23 +75,28 @@ struct MovieList: View {
             context.delete(movies[index])
         }
     }
+    private func printMovies(indexes: Bool) {
+        for movie in movies {
+            movie.printSelf()
+        }
+    }
 }
 
 #Preview {
     NavigationStack {
-        MovieList()
+        MovieList(isFileredByTitle: true)
             .modelContainer(SampleData.shared.modelContainer)
     }
 }
 #Preview("Filtered") {
     NavigationStack {
-        MovieList(titleFilter: "tr")
+        MovieList(titleFilter: "tr", isFileredByTitle: true)
             .modelContainer(SampleData.shared.modelContainer)
     }
 }
 #Preview("Empty List") {
     NavigationStack {
-        MovieList()
+        MovieList(isFileredByTitle: true)
             .modelContainer(for: Movie.self, inMemory: true)
     }
 }

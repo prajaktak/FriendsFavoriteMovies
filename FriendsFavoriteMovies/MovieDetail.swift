@@ -19,12 +19,6 @@ struct MovieDetail: View {
         self.isNew = isNew
     }
     
-    var sortedFriends: [Friend] {
-        movie.favoritedBy.sorted { first, second in
-            first.name < second.name
-        }
-     }
-    
     var body: some View {
         Form {
             TextField("Name", text: $movie.title)
@@ -32,9 +26,11 @@ struct MovieDetail: View {
             DatePicker("Release date", selection: $movie.releaseDate, displayedComponents: .date)
             if !movie.favoritedBy.isEmpty {
                 Section("Favorited by") {
-                    ForEach(sortedFriends) { friend in
+                    let friends = movie.getSortedFriends()
+                    ForEach(friends) { friend in
                         Text(friend.name)
                     }
+                    .onDelete(perform: deleteFriend(indexes:))
                 }
             }
         }
@@ -43,6 +39,7 @@ struct MovieDetail: View {
         .toolbar {if isNew {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Save") {
+                    movie.releaseDateDescription = movie.releaseDate.description
                     dismiss()
                 }
             }
@@ -52,7 +49,16 @@ struct MovieDetail: View {
                     dismiss()
                 }
             }
-        }}
+        }
+            ToolbarItem {
+                EditButton()
+            }
+        }
+    }
+    private func deleteFriend(indexes: IndexSet) {
+        for index in indexes {
+            movie.favoritedBy[index].removeFavoritedMovie()
+        }
     }
 }
 

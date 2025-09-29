@@ -35,6 +35,7 @@ struct FriendDetail: View {
                 }
                 
             }
+            .pickerStyle(.menu)
         }
         .navigationTitle(isNew ? "New Friend" : "Friend")
         .navigationBarTitleDisplayMode(.inline)

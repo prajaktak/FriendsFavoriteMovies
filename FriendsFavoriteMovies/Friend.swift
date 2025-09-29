@@ -23,4 +23,7 @@ class Friend {
            Friend(name: "Rich"),
            Friend(name: "Rody")
        ]
+    func removeFavoritedMovie() {
+        favoriteMovie = nil as Movie?
+    }
 }
