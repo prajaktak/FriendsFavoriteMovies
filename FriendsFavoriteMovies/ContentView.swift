@@ -12,10 +12,10 @@ struct ContentView: View {
         
         TabView {
             Tab("Friends", systemImage: "person.and.person") {
-                FriendList()
+                FilteredFriend()
             }
             Tab("Movies", systemImage: "film.stack") {
-               MovieList()
+               FilteredMovieList()
             }
         }
     }

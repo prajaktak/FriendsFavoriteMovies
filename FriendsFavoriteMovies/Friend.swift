@@ -11,6 +11,7 @@ import SwiftData
 @Model
 class Friend {
     var name: String
+    var favoriteMovie: Movie?
 
       init(name: String) {
           self.name = name
@@ -22,4 +23,7 @@ class Friend {
            Friend(name: "Rich"),
            Friend(name: "Rody")
        ]
+    func removeFavoritedMovie() {
+        favoriteMovie = nil as Movie?
+    }
 }

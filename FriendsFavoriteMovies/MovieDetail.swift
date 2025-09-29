@@ -24,12 +24,22 @@ struct MovieDetail: View {
             TextField("Name", text: $movie.title)
                 .autocorrectionDisabled()
             DatePicker("Release date", selection: $movie.releaseDate, displayedComponents: .date)
+            if !movie.favoritedBy.isEmpty {
+                Section("Favorited by") {
+                    let friends = movie.getSortedFriends()
+                    ForEach(friends) { friend in
+                        Text(friend.name)
+                    }
+                    .onDelete(perform: deleteFriend(indexes:))
+                }
+            }
         }
         .navigationTitle(isNew ? "New Movie" : "Movie")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {if isNew {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Save") {
+                    movie.releaseDateDescription = movie.releaseDate.description
                     dismiss()
                 }
             }
@@ -39,7 +49,16 @@ struct MovieDetail: View {
                     dismiss()
                 }
             }
-        }}
+        }
+            ToolbarItem {
+                EditButton()
+            }
+        }
+    }
+    private func deleteFriend(indexes: IndexSet) {
+        for index in indexes {
+            movie.favoritedBy[index].removeFavoritedMovie()
+        }
     }
 }
 
